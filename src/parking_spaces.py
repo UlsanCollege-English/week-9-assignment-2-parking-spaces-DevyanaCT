@@ -1,3 +1,5 @@
+import heapq
+
 """
 HW02 — Parking Spaces: Minimum Spots Needed
 
@@ -10,13 +12,32 @@ Behavior:
 """
 
 def min_parking_spots(intervals):
-    # TODO Steps:
-    # 1) Understand: we need peak overlap count.
-    # 2) Re-phrase: track earliest end; reuse when end <= start.
-    # 3) Identify: inputs list of pairs; output int; vars heap, rooms.
-    # 4) Break down: sort by start; pop ends <= start; push end; track max size.
-    # 5) Pseudocode above; implement with heapq.
-    # 6) Write code.
-    # 7) Debug with small examples.
-    # 8) Confirm O(n log n).
-    raise NotImplementedError
+    # If no cars, no parking spots needed
+    if not intervals:
+        return 0
+
+    # Sort by start time
+    intervals.sort(key=lambda x: x[0])
+
+    # Min-heap for end times of occupied spots
+    heap = []
+
+    max_spots = 0
+
+    for start, end in intervals:
+        # Free any spots where the car has already left
+        while heap and heap[0] <= start:
+            heapq.heappop(heap)
+
+        # Assign this car a spot (push its end time)
+        heapq.heappush(heap, end)
+
+        # Track peak number of occupied spots
+        max_spots = max(max_spots, len(heap))
+
+    return max_spots
+
+
+if __name__ == "__main__":
+    # Example manual test
+    print(min_parking_spots([(1,4),(2,5),(7,9)]))  # Expected: 2
